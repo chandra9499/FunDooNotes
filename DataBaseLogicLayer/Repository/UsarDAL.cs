@@ -28,9 +28,41 @@ namespace DataBaseLogicLayer.Repo
             _context = context;
             _token = token;
         }
-        public bool ChangePassword(string userId, string oldPassword, string newPassword)
+        public ResponseModel<string> ChangePassword(int userId, ChangePasswordModel passwordModel)
         {
-            throw new NotImplementedException();
+            var user = _context.Users.FirstOrDefault(x => x.UserId.Equals(userId));
+            if (user != null)
+            {
+                if (BCryptPassword.VarifyThePassword(passwordModel.OldPassword, user.Password))
+                {
+                    user.Password = BCryptPassword.BCryptThePassWord(passwordModel.NewPassword);
+                    return new ResponseModel<string>
+                    {
+                        StatusCode = (int)HttpStatusCode.Found,
+                        Success = true,
+                        Message = "the user password chenged successfully",
+                        Data = user.Password
+                    };
+                }
+                else
+                {
+                    return new ResponseModel<string>
+                    {
+                        StatusCode = (int)HttpStatusCode.NotFound,
+                        Success = true,
+                        Message = "enter the correct password",
+                        Data = passwordModel.OldPassword
+                    };
+                }
+            }
+            return new ResponseModel<string>
+            {
+                StatusCode = (int) HttpStatusCode.NotFound,
+                Success = false,
+                Message = "the user is not found",
+                Data = null
+            };
+
         }
         
         public ResponseModel<UserResponceModel> GetProfile(int userId)
@@ -71,7 +103,7 @@ namespace DataBaseLogicLayer.Repo
                 }
 
                 // Verify the password
-                bool isValidPassword = BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password);
+                bool isValidPassword = BCryptPassword.VarifyThePassword(loginModel.Password,user.Password);
                 if (!isValidPassword)
                 {
                     return new ResponseModel<TokenResponce>()
@@ -196,10 +228,32 @@ namespace DataBaseLogicLayer.Repo
         {
             throw new NotImplementedException();
         }
-
         public bool UpdateProfile(string userId, User updatedUser)
         {
             throw new NotImplementedException();
+        }
+
+        public ResponseModel<UpdateUserEmailModel> UpdateUserEmail(int userId,UpdateUserEmailModel updateUser)
+        {
+            var user = _context.Users.FirstOrDefault(user=>user.UserId.Equals(userId));
+            if (user != null)
+            {
+                user.Email = updateUser.NewEmail;
+                return new ResponseModel<UpdateUserEmailModel>
+                {
+                    StatusCode = (int) HttpStatusCode.OK,
+                    Success = true,
+                    Message = "the user email updated",
+                    Data = updateUser
+                };
+            }
+            return new ResponseModel<UpdateUserEmailModel>
+            {
+                StatusCode = (int)HttpStatusCode.NotFound,
+                Success = false,
+                Message = "the email update failed",
+                Data = null
+            };
         }
     }
 }

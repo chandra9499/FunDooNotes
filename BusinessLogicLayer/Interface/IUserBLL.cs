@@ -16,8 +16,9 @@ namespace BusinessLogicLayer.Interface
         ResponseModel<TokenResponce> LoginUser(LoginModel loginModel);
         ResponseModel<UserResponceModel> GetProfile(int userId);
         void LogoutUser();
-        bool UpdateProfile(string userId, User updatedUser);        
-        bool ChangePassword(string userId, string oldPassword, string newPassword);
+        bool UpdateProfile(string userId, User updatedUser);
+        ResponseModel<UpdateUserEmailModel> UpdateUserEmail(int userId, UpdateUserEmailModel updateUser);
+        ResponseModel<string> ChangePassword(int userId, ChangePasswordModel passwordModel);
         bool ResetPassword(string email);
     }
 }

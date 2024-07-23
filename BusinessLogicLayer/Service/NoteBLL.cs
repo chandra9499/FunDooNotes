@@ -27,7 +27,10 @@ namespace BusinessLogicLayer.Service
         {
             return _notesDAL.DeleteNote(title);
         }
-
+        public ResponseModel<NoteDTO> GetNoteByTitle(int userId, string title)
+        {
+            return _notesDAL.GetNoteByTitle(userId, title);
+        }
         public IEnumerable<Note> GetNotes(int userId)
         {
             return _notesDAL.GetNotes(userId);

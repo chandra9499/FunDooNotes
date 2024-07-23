@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Model.Models.DTOs.User;
+using Model.Models.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +14,9 @@ namespace DataBaseLogicLayer.Helper
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
-        public string VarifyThePassword(string password)
+        public static bool VarifyThePassword(string enteredPassword,string userPassword)
         {
-            return null;
+            return BCrypt.Net.BCrypt.Verify(enteredPassword, userPassword); ;
         }
     }
 }

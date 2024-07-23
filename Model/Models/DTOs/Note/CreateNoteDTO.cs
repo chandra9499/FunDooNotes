@@ -8,7 +8,7 @@ namespace Model.Models.DTOs.Note
 {
     public class CreateNoteDTO
     {
-        public string Title { get; set; }
-        public string Descreption { get; set; }
+        public string? Title { get; set; }
+        public string? Descreption { get; set; }
     }
 }

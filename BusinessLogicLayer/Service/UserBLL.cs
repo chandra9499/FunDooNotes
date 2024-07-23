@@ -19,9 +19,9 @@ namespace BusinessLogicLayer.Service
         {
             _userDAL = userDAL;
         }
-        public bool ChangePassword(string userId, string oldPassword, string newPassword)
+        public ResponseModel<string> ChangePassword(int userId, ChangePasswordModel passwordModel)
         {
-            throw new NotImplementedException();
+            return _userDAL.ChangePassword(userId, passwordModel);
         }
 
         public ResponseModel<UserResponceModel> GetProfile(int userId)
@@ -48,7 +48,10 @@ namespace BusinessLogicLayer.Service
         {
             throw new NotImplementedException();
         }
-
+        public ResponseModel<UpdateUserEmailModel> UpdateUserEmail(int userId, UpdateUserEmailModel updateUser)
+        {
+            return _userDAL.UpdateUserEmail(userId, updateUser);
+        }
         public bool UpdateProfile(string userId, User updatedUser)
         {
             throw new NotImplementedException();

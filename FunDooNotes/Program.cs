@@ -43,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Userid", policy =>
-        policy.RequireClaim(ClaimTypes.Sid));
+        policy.RequireClaim(ClaimTypes.Sid));//I am using this claim from jwt by using police
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

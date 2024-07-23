@@ -60,5 +60,16 @@ namespace FunDooNotes.Controllers
             var status = _noteBLL.GetNotes(Convert.ToInt32(userId));
             return Ok(status);
         }
+        [HttpGet]
+        public IActionResult GetNoteByTitle([FromQuery]string title)
+        {
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(new ErrorStatus() {StatusCode = (int) HttpStatusCode.BadRequest,Message= "pass all the requiered fields" });
+            }
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value;
+            var status = _noteBLL.GetNoteByTitle(Convert.ToInt32(userId),title);
+            return Ok(status);
+        }
     }
 }

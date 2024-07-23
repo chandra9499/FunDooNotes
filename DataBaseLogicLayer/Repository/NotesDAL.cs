@@ -40,7 +40,8 @@ namespace DataBaseLogicLayer.Repository
                     {
                         Title = note.Title,
                         Description = note.Description,
-                        CreatedAt=DateTime.Now
+                        CreatedAt=DateTime.Now,
+                        UserId = note.UserId
                     }
                 };
             }
@@ -65,7 +66,7 @@ namespace DataBaseLogicLayer.Repository
                     Message = $"note with { title } is deleted",
                     Data = new NoteDTO()
                     {
-                        NoteId=notes.NoteId,
+                        //NoteId=notes.NoteId,
                         Title = notes.Title,
                         CreatedAt=notes.CreatedAt,
                         Description=notes.Description,
@@ -75,7 +76,7 @@ namespace DataBaseLogicLayer.Repository
             }
             catch(Exception ex) 
             {
-                throw new Exception($"note with {title} is not deleted");
+                throw new Exception($"note with {title} is not deleted",ex);
             }
         }
 
@@ -101,7 +102,7 @@ namespace DataBaseLogicLayer.Repository
                         Message = "updation successfull",
                         Data = new NoteDTO()
                         {
-                            NoteId = notes.NoteId,
+                            //NoteId = notes.NoteId,
                             Title = notes.Title,
                             CreatedAt = notes.CreatedAt,
                             Description = notes.Description,
@@ -112,7 +113,7 @@ namespace DataBaseLogicLayer.Repository
                 }
                 catch (Exception ex) 
                 {
-                    throw new Exception("updation unsuccessfull");
+                    throw new Exception("updation unsuccessfull",ex);
                 }
             }
             return new ResponseModel<NoteDTO>
@@ -123,6 +124,48 @@ namespace DataBaseLogicLayer.Repository
                 Data = null
             };
             
+        }
+
+        public ResponseModel<NoteDTO> GetNoteByTitle(int userId,string title)
+        {
+            var userNotes = GetNotes(userId).ToList();
+            if (userNotes != null) 
+            {
+                var note = userNotes.FirstOrDefault(note => note.Title.Equals(title));
+                if (note != null)
+                {
+                    return new ResponseModel<NoteDTO>()
+                    {
+                        StatusCode = (int)HttpStatusCode.Found,
+                        Success = true,
+                        Message = $"the note with the title {title} is",
+                        Data = new NoteDTO()
+                        {
+                            //NoteId = note.NoteId,
+                            Title = note.Title,
+                            CreatedAt = note.CreatedAt,
+                            Description = note.Description,
+                            UpdatedAt = note.UpdatedAt,
+                            UserId = note.UserId
+                        }
+                    };
+                    
+                }
+                return new ResponseModel<NoteDTO>()
+                {
+                    StatusCode = (int)HttpStatusCode.NotFound,
+                    Success = false,
+                    Message = $"the note with the title {title} is not present",
+                    Data = null
+                };
+            }
+            return new ResponseModel<NoteDTO> 
+            {
+                StatusCode = (int) HttpStatusCode.OK,
+                Success = false,
+                Message = "the user does not have any note",
+                Data = null
+            };
         }
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Model.Models.DTOs.User;
 using Model.Models.Utility;
+using System.Net;
 
 namespace FunDooNotes.Controllers
 {
@@ -44,6 +45,18 @@ namespace FunDooNotes.Controllers
             Console.WriteLine(userId);
             //var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
             var status = _userBLL.GetProfile(Convert.ToInt32(userId));
+            return Ok(status);
+        }
+        [HttpPut]
+        [Authorize(Policy = "Userid")]
+        public IActionResult UpdateUserEmail([FromQuery]UpdateUserEmailModel updateUser)
+        { 
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(new ErrorStatus { StatusCode = (int) HttpStatusCode.BadRequest,Message="plese pass all the requiered parameter" });
+            }
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value;
+            var status = _userBLL.UpdateUserEmail(Convert.ToInt32(userId), updateUser);
             return Ok(status);
         }
     }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Model.Models.DTOs.User
 {
-    public class ResetPasswordModel
+    public class UpdateUserEmailModel
     {
-        public string? Email { get; set; }
+        public string? NewEmail { get; set; }
     }
 }
