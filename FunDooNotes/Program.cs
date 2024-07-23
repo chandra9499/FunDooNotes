@@ -4,6 +4,7 @@ using DataBaseLogicLayer.Context;
 using DataBaseLogicLayer.Helper;
 using DataBaseLogicLayer.Interface;
 using DataBaseLogicLayer.Repo;
+using DataBaseLogicLayer.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -20,6 +21,8 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<FunDooDataBaseContext>(cfg=>cfg.UseSqlServer(builder.Configuration.GetConnectionString("FunDooConnection")));
 builder.Services.AddTransient<IUserBLL,UserBLL>();
 builder.Services.AddTransient<IUserDAL, UsarDAL>();
+builder.Services.AddTransient<INoteBLL,NoteBLL>();
+builder.Services.AddTransient<INotesDAL,NotesDAL>();
 builder.Services.AddTransient<TokenGenarator>();
 
 // Add services to the container;

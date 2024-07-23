@@ -35,7 +35,7 @@ namespace BusinessLogicLayer.Service
 
         public ResponseModel<NoteDTO> UpdateNote(CreateNoteDTO createNote)
         {
-            return _notesDAL.UpdateNote(createNote); D:\ASP.NET\Entity frame work projects\FunDooNotes\FunDooNotes\FunDooNotes.sln
+            return _notesDAL.UpdateNote(createNote); 
         }
     }
 }
