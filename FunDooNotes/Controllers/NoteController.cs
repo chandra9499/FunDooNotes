@@ -18,6 +18,7 @@ namespace FunDooNotes.Controllers
         {
             _noteBLL = noteBLL;
         }
+
         [HttpPost]
         public IActionResult CreateNote(CreateNoteDTO createNote)
         {
@@ -69,6 +70,17 @@ namespace FunDooNotes.Controllers
             }
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value;
             var status = _noteBLL.GetNoteByTitle(Convert.ToInt32(userId),title);
+            return Ok(status);
+        }
+        [HttpPut]
+        public IActionResult AddColourToNote([FromQuery]UpdateColourModel updateColour)
+        {
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(new ErrorStatus() { StatusCode = (int)HttpStatusCode.BadRequest, Message = "pass all the requiered fields" });
+            }
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.Sid)?.Value;
+            var status = _noteBLL.AddColourToNote(Convert.ToInt32(userId),updateColour);
             return Ok(status);
         }
     }

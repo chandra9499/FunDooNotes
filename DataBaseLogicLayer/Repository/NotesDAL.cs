@@ -167,5 +167,48 @@ namespace DataBaseLogicLayer.Repository
                 Data = null
             };
         }
+
+        public ResponseModel<NoteDTO> AddColourToNote(int userId,UpdateColourModel updateColour)
+        {
+            var userNotes = GetNotes(userId).ToList();
+            if (userNotes!=null)
+            {
+                var note = userNotes.FirstOrDefault(note=>note.Title.Equals(updateColour.Title));
+                if (note != null) 
+                {
+                    note.Colour = updateColour.Colour;
+                    _context.SaveChanges();
+                    return new ResponseModel<NoteDTO>()
+                    {
+                        StatusCode = (int) HttpStatusCode.OK,
+                        Success = true,
+                        Message = $"colour added to the note with title:-{updateColour.Title}",
+                        Data = new NoteDTO()
+                        {
+                            Title = note.Title,
+                            colour = note.Colour,
+                            CreatedAt = note.CreatedAt,
+                            UpdatedAt = DateTime.Now,
+                            Description = note.Description,
+                            UserId = note.UserId
+                        }
+                    };
+                }
+                return new ResponseModel<NoteDTO>()
+                {
+                    StatusCode = (int)HttpStatusCode.NotFound,
+                    Success = false,
+                    Message = $"the note with title:-{updateColour.Title} is not present",
+                    Data = null
+                };
+            }
+            return new ResponseModel<NoteDTO>()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Success = false,
+                Message = $"the user doesn't have any notes",
+                Data = null
+            };
+        }
     }
 }

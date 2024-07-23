@@ -38,7 +38,11 @@ namespace BusinessLogicLayer.Service
 
         public ResponseModel<NoteDTO> UpdateNote(CreateNoteDTO createNote)
         {
-            return _notesDAL.UpdateNote(createNote); 
+            return _notesDAL.UpdateNote(createNote);
+        }
+        public ResponseModel<NoteDTO> AddColourToNote(int userId, UpdateColourModel updateColour)
+        {
+            return _notesDAL.AddColourToNote(userId,updateColour);
         }
     }
 }

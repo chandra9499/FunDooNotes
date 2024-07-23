@@ -16,5 +16,6 @@ namespace DataBaseLogicLayer.Interface
         ResponseModel<NoteDTO> UpdateNote(CreateNoteDTO createNote);
         ResponseModel<NoteDTO> GetNoteByTitle(int userId, string title);
         ResponseModel<NoteDTO> DeleteNote(string title);
+        ResponseModel<NoteDTO> AddColourToNote(int userId,UpdateColourModel updateColour);
     }
 }

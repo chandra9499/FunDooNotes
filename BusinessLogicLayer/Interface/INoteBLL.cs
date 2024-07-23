@@ -13,6 +13,7 @@ namespace BusinessLogicLayer.Interface
     {
         ResponseModel<NoteDTO> CreateNote(int userId, CreateNoteDTO createNote);
         IEnumerable<Note> GetNotes(int userId);
+        ResponseModel<NoteDTO> AddColourToNote(int userId, UpdateColourModel updateColour);
         ResponseModel<NoteDTO> UpdateNote(CreateNoteDTO createNote);
         ResponseModel<NoteDTO> GetNoteByTitle(int userId, string title);
         ResponseModel<NoteDTO> DeleteNote(string title);
