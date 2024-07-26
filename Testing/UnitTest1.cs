@@ -24,7 +24,6 @@ public class Tests
     [SetUp]
     public void Setup()
     {
-
         var configaration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
@@ -36,52 +35,69 @@ public class Tests
         _context = new FunDooDataBaseContext(option);
         _context.Database.EnsureCreated();
 
-        userDAL = new UsarDAL(_context,new TokenGenarator(configaration));
+        userDAL = new UsarDAL(_context, new TokenGenarator(configaration));
         userBLL = new UserBLL(userDAL);
         userController = new UserController(userBLL);
+    }
+    [TearDown]
+    public void TearDown()
+    {
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
     }
 
     [Test]
     public void RegisterUser_ReturnOkStatus()
     {
-        //Act
+        //Arrange
         var registerUser = new RegisterUserModel()
         {
-            FirstName = "dharu",
+            FirstName = "chandra",
             LastName = "c",
-            Email = "dharu@gmail.com",
-            Password = "dharu@123"
+            Email = "chandra@gmail.com",
+            Password = "chandraS@123"
         };
-        //Arrange
+        //Act
         var result = userController.RegisterUser(registerUser);
         //Assert
         Assert.IsInstanceOf<OkObjectResult>(result);
-        
-        var okObject = result as OkObjectResult;
 
+        var okObject = result as OkObjectResult;
         var responceModel = okObject.Value as ResponseModel<User>;
 
         Assert.IsNotNull(responceModel);
-        Assert.AreEqual(registerUser.Email,responceModel.Data.Email);
+        Assert.AreEqual(registerUser.Email, responceModel.Data.Email);
     }
     [Test]
     public void Registering_AllReadyExstingUSer()
     {
-        var registerUserModel = new RegisterUserModel()
+        //arrage
+        var registerUserModel = new User()
         {
-            FirstName = "komal",
-            LastName = "K",
-            Email = "komal@gmail.com",
-            Password = "komal@123"
+            FirstName = "akhil",
+            LastName = "B",
+            Email = "akhil@gmail.com",
+            Password = "akhil@123"
         };
-        var result = userController.RegisterUser(registerUserModel);
+        _context.Add(registerUserModel);
+        _context.SaveChanges();
+        var exstingUserModel = new RegisterUserModel()
+        {
+            FirstName = "akhil",
+            LastName = "B",
+            Email = "akhil@gmail.com",
+            Password = "akhil@123"
+        };
+        //act
+        var result = userController.RegisterUser(exstingUserModel);
 
+        //assert
         Assert.IsInstanceOf<ConflictObjectResult>(result);
-        
+
         var okObject = result as ConflictObjectResult;
 
         var responceModel = okObject.Value as ResponseModel<User>;
         Assert.IsNotNull(responceModel);
-        Assert.AreEqual("The Email is already registered",responceModel.Message);
+        Assert.AreEqual("The Email is already registered", responceModel.Message);
     }
 }
