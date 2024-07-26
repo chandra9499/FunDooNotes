@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Model.Models.DTOs.Note
 {
-    public class CreateNoteDTO
+    public class AddLabelsModel
     {
         public string? Title { get; set; }
-        public string? Descreption { get; set; }
-        public List<string> Labels { get; set; }
+        public List<string>? Labels { get; set;}
     }
 }

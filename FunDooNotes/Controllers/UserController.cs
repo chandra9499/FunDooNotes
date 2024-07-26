@@ -6,6 +6,7 @@ using Model.Models.DTOs.User;
 using Model.Models.Utility;
 using System.Net;
 
+
 namespace FunDooNotes.Controllers
 {
     [Route("api/[controller]/[action]")]
@@ -25,6 +26,11 @@ namespace FunDooNotes.Controllers
                 return BadRequest(new ErrorStatus{ StatusCode = 0, Message = "Please pass all the fields" });
             }
             var status = _userBLL.RegisterUser(registerUser);
+
+            if (!status.Success)
+            {
+                return Conflict(status);
+            }
             return Ok(status);
         }
         [HttpPost]

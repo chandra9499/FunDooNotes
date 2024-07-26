@@ -8,7 +8,7 @@ namespace Model.Models.DTOs.Note
 {
     public class UpdateColourModel
     {
-        public string Title { get; set; }
-        public string Colour { get; set; }
+        public string? Title { get; set; }
+        public string? Colour { get; set; }
     }
 }

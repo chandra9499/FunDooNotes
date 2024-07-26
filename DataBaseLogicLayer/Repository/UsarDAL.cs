@@ -17,13 +17,13 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataBaseLogicLayer.Repo
+namespace DataBaseLogicLayer.Repository
 {
     public class UsarDAL : IUserDAL
     {
         private readonly FunDooDataBaseContext _context;
         private readonly TokenGenarator _token;
-        public UsarDAL(FunDooDataBaseContext context, TokenGenarator token)
+        public UsarDAL(FunDooDataBaseContext context,TokenGenarator token) 
         {
             _context = context;
             _token = token;
@@ -57,24 +57,24 @@ namespace DataBaseLogicLayer.Repo
             }
             return new ResponseModel<string>
             {
-                StatusCode = (int) HttpStatusCode.NotFound,
+                StatusCode = (int)HttpStatusCode.NotFound,
                 Success = false,
                 Message = "the user is not found",
                 Data = null
             };
 
         }
-        
+
         public ResponseModel<UserResponceModel> GetProfile(int userId)
         {
-            var user = _context.Users.FirstOrDefault(user=>user.UserId.Equals(userId));
-            if (user != null) 
+            var user = _context.Users.FirstOrDefault(user => user.UserId.Equals(userId));
+            if (user != null)
             {
                 return new ResponseModel<UserResponceModel>()
                 {
-                    StatusCode =(int) HttpStatusCode.OK,
+                    StatusCode = (int)HttpStatusCode.OK,
                     Message = "user information is featched",
-                    Data = new UserResponceModel() { FirstName=user.FirstName,LastName=user.LastName, Email=user.Email }
+                    Data = new UserResponceModel() { FirstName = user.FirstName, LastName = user.LastName, Email = user.Email }
                 };
             }
             return new ResponseModel<UserResponceModel>()
@@ -103,7 +103,7 @@ namespace DataBaseLogicLayer.Repo
                 }
 
                 // Verify the password
-                bool isValidPassword = BCryptPassword.VarifyThePassword(loginModel.Password,user.Password);
+                bool isValidPassword = BCryptPassword.VarifyThePassword(loginModel.Password, user.Password);
                 if (!isValidPassword)
                 {
                     return new ResponseModel<TokenResponce>()
@@ -114,7 +114,7 @@ namespace DataBaseLogicLayer.Repo
                         Data = null
                     };
                 }
-                
+
                 // Create claims for the JWT
                 var authClaims = new List<Claim>()
                 {
@@ -126,7 +126,7 @@ namespace DataBaseLogicLayer.Repo
                 // Generate tokens
                 var token = _token.GetToken(authClaims);
                 var refreshToken = _token.GetRefreshToken();
-                
+
                 var userToken = _context.Tokens.FirstOrDefault(token => token.Email.Equals(user.Email));
                 if (userToken != null)
                 {
@@ -141,16 +141,16 @@ namespace DataBaseLogicLayer.Repo
                         _context.Tokens.Add(info);
                         _context.SaveChanges();
                     }
-                    catch (Exception ex) 
+                    catch (Exception ex)
                     {
-                        throw new Exception("unable to save the token",ex);
+                        throw new Exception("unable to save the token", ex);
                     }
                 }
-                
+
 
                 return new ResponseModel<TokenResponce>()
                 {
-                    StatusCode = (int) HttpStatusCode.OK,
+                    StatusCode = (int)HttpStatusCode.OK,
                     Message = "Logged in",
                     Success = true,
                     Data = token
@@ -161,7 +161,7 @@ namespace DataBaseLogicLayer.Repo
                 // Handle exceptions
                 return new ResponseModel<TokenResponce>()
                 {
-                    StatusCode = (int) HttpStatusCode.InternalServerError,
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
                     Message = "An error occurred while logging in: " + ex.Message,
                     Success = false,
                     Data = null
@@ -195,7 +195,7 @@ namespace DataBaseLogicLayer.Repo
         public ResponseModel<User> RegisterUser(RegisterUserModel registerUser)
         {
             //check if the user exist or not
-            var userExist = (User)_context.Users.Where(user => user.Email.Equals(registerUser.Email)).FirstOrDefault();
+            var userExist = _context.Users.Where(user => user.Email.Equals(registerUser.Email)).FirstOrDefault();
 
             if (userExist != null)
             {
@@ -233,15 +233,15 @@ namespace DataBaseLogicLayer.Repo
             throw new NotImplementedException();
         }
 
-        public ResponseModel<UpdateUserEmailModel> UpdateUserEmail(int userId,UpdateUserEmailModel updateUser)
+        public ResponseModel<UpdateUserEmailModel> UpdateUserEmail(int userId, UpdateUserEmailModel updateUser)
         {
-            var user = _context.Users.FirstOrDefault(user=>user.UserId.Equals(userId));
+            var user = _context.Users.FirstOrDefault(user => user.UserId.Equals(userId));
             if (user != null)
             {
                 user.Email = updateUser.NewEmail;
                 return new ResponseModel<UpdateUserEmailModel>
                 {
-                    StatusCode = (int) HttpStatusCode.OK,
+                    StatusCode = (int)HttpStatusCode.OK,
                     Success = true,
                     Message = "the user email updated",
                     Data = updateUser

@@ -15,16 +15,16 @@ namespace DataBaseLogicLayer.Repository
     public class NotesDAL : INotesDAL
     {
         private readonly FunDooDataBaseContext _context;
-        public NotesDAL(FunDooDataBaseContext context) 
+        public NotesDAL(FunDooDataBaseContext context)
         {
             _context = context;
         }
-        public ResponseModel<NoteDTO> CreateNote(int userId,CreateNoteDTO createNote)
+        public ResponseModel<NoteDTO> CreateNote(int userId, CreateNoteDTO createNote)
         {
             var note = new Note()
-            {               
-                Title=createNote.Title,
-                Description=createNote.Descreption,
+            {
+                Title = createNote.Title,
+                Description = createNote.Descreption,
                 CreatedAt = DateTime.Now,
                 UserId = userId
             };
@@ -32,24 +32,24 @@ namespace DataBaseLogicLayer.Repository
             try
             {
                 _context.SaveChanges();
-                return new ResponseModel<NoteDTO> 
-                { 
-                    StatusCode = (int) HttpStatusCode.Created,
+                return new ResponseModel<NoteDTO>
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
                     Message = "Notes Created",
-                    Data =  new NoteDTO()
+                    Data = new NoteDTO()
                     {
                         Title = note.Title,
                         Description = note.Description,
-                        CreatedAt=DateTime.Now,
+                        CreatedAt = DateTime.Now,
                         UserId = note.UserId
                     }
                 };
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                throw new Exception("unable to create notes",ex);
+                throw new Exception("unable to create notes", ex);
             }
-            
+
         }
 
         public ResponseModel<NoteDTO> DeleteNote(string title)
@@ -59,24 +59,24 @@ namespace DataBaseLogicLayer.Repository
             try
             {
                 _context.SaveChanges();
-                return new ResponseModel<NoteDTO> 
+                return new ResponseModel<NoteDTO>
                 {
-                    StatusCode=(int) HttpStatusCode.OK,
+                    StatusCode = (int)HttpStatusCode.OK,
                     Success = true,
-                    Message = $"note with { title } is deleted",
+                    Message = $"note with {title} is deleted",
                     Data = new NoteDTO()
                     {
                         //NoteId=notes.NoteId,
                         Title = notes.Title,
-                        CreatedAt=notes.CreatedAt,
-                        Description=notes.Description,
+                        CreatedAt = notes.CreatedAt,
+                        Description = notes.Description,
                         UserId = notes.UserId
                     }
                 };
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                throw new Exception($"note with {title} is not deleted",ex);
+                throw new Exception($"note with {title} is not deleted", ex);
             }
         }
 
@@ -87,7 +87,7 @@ namespace DataBaseLogicLayer.Repository
 
         public ResponseModel<NoteDTO> UpdateNote(CreateNoteDTO createNote)
         {
-            var notes = _context.Notes.FirstOrDefault(note=>note.Title.Equals(createNote.Title));
+            var notes = _context.Notes.FirstOrDefault(note => note.Title.Equals(createNote.Title));
             if (notes != null)
             {
                 notes.Description = createNote.Descreption;
@@ -111,9 +111,9 @@ namespace DataBaseLogicLayer.Repository
                         }
                     };
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
-                    throw new Exception("updation unsuccessfull",ex);
+                    throw new Exception("updation unsuccessfull", ex);
                 }
             }
             return new ResponseModel<NoteDTO>
@@ -123,13 +123,13 @@ namespace DataBaseLogicLayer.Repository
                 Message = $"notes with the {createNote.Title} is not present",
                 Data = null
             };
-            
+
         }
 
-        public ResponseModel<NoteDTO> GetNoteByTitle(int userId,string title)
+        public ResponseModel<NoteDTO> GetNoteByTitle(int userId, string title)
         {
             var userNotes = GetNotes(userId).ToList();
-            if (userNotes != null) 
+            if (userNotes != null)
             {
                 var note = userNotes.FirstOrDefault(note => note.Title.Equals(title));
                 if (note != null)
@@ -149,7 +149,7 @@ namespace DataBaseLogicLayer.Repository
                             UserId = note.UserId
                         }
                     };
-                    
+
                 }
                 return new ResponseModel<NoteDTO>()
                 {
@@ -159,28 +159,28 @@ namespace DataBaseLogicLayer.Repository
                     Data = null
                 };
             }
-            return new ResponseModel<NoteDTO> 
+            return new ResponseModel<NoteDTO>
             {
-                StatusCode = (int) HttpStatusCode.OK,
+                StatusCode = (int)HttpStatusCode.OK,
                 Success = false,
                 Message = "the user does not have any note",
                 Data = null
             };
         }
 
-        public ResponseModel<NoteDTO> AddColourToNote(int userId,UpdateColourModel updateColour)
+        public ResponseModel<NoteDTO> AddColourToNote(int userId, UpdateColourModel updateColour)
         {
             var userNotes = GetNotes(userId).ToList();
-            if (userNotes!=null)
+            if (userNotes != null)
             {
-                var note = userNotes.FirstOrDefault(note=>note.Title.Equals(updateColour.Title));
-                if (note != null) 
+                var note = userNotes.FirstOrDefault(note => note.Title.Equals(updateColour.Title));
+                if (note != null)
                 {
                     note.Colour = updateColour.Colour;
                     _context.SaveChanges();
                     return new ResponseModel<NoteDTO>()
                     {
-                        StatusCode = (int) HttpStatusCode.OK,
+                        StatusCode = (int)HttpStatusCode.OK,
                         Success = true,
                         Message = $"colour added to the note with title:-{updateColour.Title}",
                         Data = new NoteDTO()
@@ -210,5 +210,7 @@ namespace DataBaseLogicLayer.Repository
                 Data = null
             };
         }
+
+        
     }
 }

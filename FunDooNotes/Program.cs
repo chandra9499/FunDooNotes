@@ -3,7 +3,6 @@ using BusinessLogicLayer.Service;
 using DataBaseLogicLayer.Context;
 using DataBaseLogicLayer.Helper;
 using DataBaseLogicLayer.Interface;
-using DataBaseLogicLayer.Repo;
 using DataBaseLogicLayer.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -85,10 +84,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    //Console.WriteLine(builder.Configuration["FunDooConnectionS"]);
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+//Console.WriteLine(builder.Configuration.GetConnectionString("FunDooConnectionS"));
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
