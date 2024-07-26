@@ -19,8 +19,7 @@ namespace Model.Models.Entity
         public bool IsArchived { get; set; } = false;
         public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public List<Labels>? Labels { get; set; }
+        public DateTime UpdatedAt { get; set; }        
         [ForeignKey("Users")]
         public int UserId { get; set; }
     }

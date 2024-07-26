@@ -30,7 +30,7 @@ public class Tests
             .AddJsonFile("appsettings.json")
             .Build();
         var option = new DbContextOptionsBuilder<FunDooDataBaseContext>()
-            .UseSqlServer(configaration.GetConnectionString("FunDooConnection"))
+            .UseSqlServer(configaration.GetConnectionString("FunDooConnection_Test"))
             .Options;
 
         _context = new FunDooDataBaseContext(option);
@@ -47,10 +47,10 @@ public class Tests
         //Act
         var registerUser = new RegisterUserModel()
         {
-            FirstName = "komal",
-            LastName = "K",
-            Email = "komal@gmail.com",
-            Password = "komal@123"
+            FirstName = "dharu",
+            LastName = "c",
+            Email = "dharu@gmail.com",
+            Password = "dharu@123"
         };
         //Arrange
         var result = userController.RegisterUser(registerUser);
@@ -69,10 +69,10 @@ public class Tests
     {
         var registerUserModel = new RegisterUserModel()
         {
-            FirstName = "pooja",
-            LastName = "k",
-            Email = "pooja@gmail.com",
-            Password = "pooja@123"
+            FirstName = "komal",
+            LastName = "K",
+            Email = "komal@gmail.com",
+            Password = "komal@123"
         };
         var result = userController.RegisterUser(registerUserModel);
 
