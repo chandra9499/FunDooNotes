@@ -13,7 +13,7 @@ namespace Model.Models.Entity
         [Key]
         public int LabelsId { get; set; }
         public string? LabelsName { get; set; }
-        public string? LabelsDescription { get; set;}        
-        public List<Note>? Notes  { get; set; }
+        public string? LabelsDescription { get; set;}
+        public List<NoteLabels>? NoteLabels { get; set; } 
     }
 }

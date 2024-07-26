@@ -20,7 +20,7 @@ namespace Model.Models.Entity
         public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public List<Labels>? Labels { get; set; }
+        public List<NoteLabels>? NoteLabels { get; set; }
         [ForeignKey("Users")]
         public int UserId { get; set; }
     }

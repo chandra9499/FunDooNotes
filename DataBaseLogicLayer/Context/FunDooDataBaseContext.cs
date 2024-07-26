@@ -13,7 +13,8 @@ namespace DataBaseLogicLayer.Context
         public FunDooDataBaseContext(DbContextOptions<FunDooDataBaseContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Labels>().HasKey(labels => new { labels.LabelsId , labels.Notes});
+            modelBuilder.Entity<NoteLabels>().HasKey(labels => new { labels.LabelId , labels.NoteId});
+            modelBuilder
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Note> Notes { get; set; }
