@@ -10,6 +10,5 @@ namespace Model.Models.DTOs.Note
     {
         public string? Title { get; set; }
         public string? Descreption { get; set; }
-        public List<string> Labels { get; set; }
     }
 }

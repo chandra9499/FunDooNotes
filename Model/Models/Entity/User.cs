@@ -12,12 +12,14 @@ namespace Model.Models.Entity
         [Key]
         public int UserId { get; set; }
         [Required(ErrorMessage = "First name is required.")]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
         [Required(ErrorMessage = "Last name is required.")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
         [Required(ErrorMessage = "Email is required.")]
+        [RegularExpression(@"^[\w.]+[@][\w]+[.][a-z[A-Z]]{2,3}$")]
         public string Email { get; set; }
         [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; }
+        public ICollection<Note>? Notes { get; set;}
     }
 }

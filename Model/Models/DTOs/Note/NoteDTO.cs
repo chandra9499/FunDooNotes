@@ -13,7 +13,7 @@ namespace Model.Models.DTOs.Note
         public string? Title { get; set; }
         public List<string>? Labels { get; set; }
         public string? Description { get; set; }
-        public string? colour { get; set; } 
+        public string? Colour { get; set; } 
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }

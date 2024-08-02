@@ -1,4 +1,5 @@
-﻿using Model.Models.DTOs.Note;
+﻿using Model.Models.DTOs.Labels;
+using Model.Models.DTOs.Note;
 using Model.Models.Entity;
 using Model.Models.Utility;
 using System;
@@ -11,11 +12,12 @@ namespace BusinessLogicLayer.Interface
 {
     public interface INoteBLL
     {
-        ResponseModel<NoteDTO> CreateNote(int userId, CreateNoteDTO createNote);
-        IEnumerable<Note> GetNotes(int userId);
-        ResponseModel<NoteDTO> AddColourToNote(int userId, UpdateColourModel updateColour);
-        ResponseModel<NoteDTO> UpdateNote(CreateNoteDTO createNote);
-        ResponseModel<NoteDTO> GetNoteByTitle(int userId, string title);
-        ResponseModel<NoteDTO> DeleteNote(string title);
+        Task<ResponseModel<NoteDTO>> CreateNoteAsync(int userId, CreateNoteDTO createNote);
+        Task<IEnumerable<Note>> GetNotesAsync(int userId);
+        Task<ResponseModel<NoteDTO>> UpdateNoteAsync(CreateNoteDTO createNote);
+        Task<ResponseModel<List<Note>>> GetNoteByIdAsync(int userId, int noteId);
+        Task<ResponseModel<NoteDTO>> DeleteNoteAsync(string title);
+        Task<ResponseModel<NoteDTO>> AddColourToNoteAsync(int userId, UpdateColourModel updateColour);
+        Task<ResponseModel<Labels>> AddLabelsToNotesAsync(int noteId, LabelRequestModel addLabels);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BusinessLogicLayer.Interface;
 using DataBaseLogicLayer.Interface;
+using Model.Models.DTOs;
 using Model.Models.DTOs.Token;
 using Model.Models.DTOs.User;
 using Model.Models.Entity;
@@ -44,9 +45,9 @@ namespace BusinessLogicLayer.Service
             return _userDAL.RegisterUser(registerUser);
         }
 
-        public bool ResetPassword(string email)
+        public Task<bool> ResetPassword(EmailModel emailModel)
         {
-            throw new NotImplementedException();
+            return _userDAL.ResetPassword(emailModel);
         }
         public ResponseModel<UpdateUserEmailModel> UpdateUserEmail(int userId, UpdateUserEmailModel updateUser)
         {

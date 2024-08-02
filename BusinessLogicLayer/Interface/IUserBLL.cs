@@ -1,4 +1,5 @@
-﻿using Model.Models.DTOs.Token;
+﻿using Model.Models.DTOs;
+using Model.Models.DTOs.Token;
 using Model.Models.DTOs.User;
 using Model.Models.Entity;
 using Model.Models.Utility;
@@ -19,6 +20,6 @@ namespace BusinessLogicLayer.Interface
         bool UpdateProfile(string userId, User updatedUser);
         ResponseModel<UpdateUserEmailModel> UpdateUserEmail(int userId, UpdateUserEmailModel updateUser);
         ResponseModel<string> ChangePassword(int userId, ChangePasswordModel passwordModel);
-        bool ResetPassword(string email);
+        Task<bool> ResetPassword(EmailModel  emailModel);
     }
 }

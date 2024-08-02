@@ -16,6 +16,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Mail;
+using DataBaseLayer.Helper;
+using Model.Models.DTOs;
 
 namespace DataBaseLogicLayer.Repository
 {
@@ -127,25 +130,25 @@ namespace DataBaseLogicLayer.Repository
                 var token = _token.GetToken(authClaims);
                 var refreshToken = _token.GetRefreshToken();
 
-                var userToken = _context.Tokens.FirstOrDefault(token => token.Email.Equals(user.Email));
-                if (userToken != null)
-                {
-                    var info = new TokenInfo()
-                    {
-                        Email = user.Email,
-                        Token = token.TokenString,
-                        TokenExpiry = DateTime.Now.AddDays(7)
-                    };
-                    try
-                    {
-                        _context.Tokens.Add(info);
-                        _context.SaveChanges();
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception("unable to save the token", ex);
-                    }
-                }
+                //var userToken = _context.Tokens.FirstOrDefault(token => token.Email.Equals(user.Email));
+                //if (userToken != null)
+                //{
+                //    var info = new TokenInfo()
+                //    {
+                //        Email = user.Email,
+                //        Token = token.TokenString,
+                //        TokenExpiry = DateTime.Now.AddDays(7)
+                //    };
+                //    try
+                //    {
+                //        _context.Tokens.Add(info);
+                //        _context.SaveChanges();
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        throw new Exception("unable to save the token", ex);
+                //    }
+                //}
 
 
                 return new ResponseModel<TokenResponce>()
@@ -173,7 +176,6 @@ namespace DataBaseLogicLayer.Repository
         {
             throw new NotImplementedException();
         }
-
         /*
          * 	
             Response body
@@ -195,7 +197,7 @@ namespace DataBaseLogicLayer.Repository
         public ResponseModel<User> RegisterUser(RegisterUserModel registerUser)
         {
             //check if the user exist or not
-            var userExist = _context.Users.Where(user => user.Email.Equals(registerUser.Email)).FirstOrDefault();
+            var userExist = _context.Users.FirstOrDefault(user => user.Email.Equals(registerUser.Email));
 
             if (userExist != null)
             {
@@ -220,13 +222,26 @@ namespace DataBaseLogicLayer.Repository
             }
             catch (Exception ex)
             {
-                throw new Exception("user creation failed");
+                throw;
             }
         }
-
-        public bool ResetPassword(string email)
+        public async Task<bool> ResetPassword(EmailModel emailModel)
         {
-            throw new NotImplementedException();
+            var user = _context.Users.FirstOrDefault(user => user.Email.Equals(emailModel.Email));
+            if (user == null)
+            {
+                return false;
+            }
+
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Sid, Convert.ToString(user.UserId)),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var token = _token.GetToken(authClaims).TokenString;
+            return await EmailSender.SendEmailAsync(emailModel.Email, "Password Reset Token", token);
         }
         public bool UpdateProfile(string userId, User updatedUser)
         {

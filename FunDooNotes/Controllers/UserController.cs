@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Model.Models.DTOs;
 using Model.Models.DTOs.User;
 using Model.Models.Utility;
 using System.Net;
@@ -65,5 +66,12 @@ namespace FunDooNotes.Controllers
             var status = _userBLL.UpdateUserEmail(Convert.ToInt32(userId), updateUser);
             return Ok(status);
         }
+
+        //[HttpPost]
+        //public bool ResetPassword([FromBody]EmailModel emailModel)
+        //{
+        //    var status = _userBLL.ResetPassword(emailModel);
+        //    return status;
+        //}
     }
 }

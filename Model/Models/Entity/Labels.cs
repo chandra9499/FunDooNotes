@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Model.Models.Entity
@@ -14,6 +15,8 @@ namespace Model.Models.Entity
         public int LabelsId { get; set; }
         public string? LabelsName { get; set; }
         public string? LabelsDescription { get; set;}
-        public List<NoteLabels>? NoteLabels { get; set; } 
+        [JsonIgnore]
+        public ICollection<Note>? Notes { get; set; } 
+        
     }
 }

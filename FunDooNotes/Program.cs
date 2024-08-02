@@ -1,5 +1,10 @@
+using BusinessLayer.Interface;
+using BusinessLayer.Service;
 using BusinessLogicLayer.Interface;
 using BusinessLogicLayer.Service;
+using DataBaseLayer.Helper;
+using DataBaseLayer.Interface;
+using DataBaseLayer.Repository;
 using DataBaseLogicLayer.Context;
 using DataBaseLogicLayer.Helper;
 using DataBaseLogicLayer.Interface;
@@ -12,18 +17,22 @@ using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
-
 builder.Services.AddControllers();
+
 //let's initialize the database context
 builder.Services.AddDbContext<FunDooDataBaseContext>(cfg=>cfg.UseSqlServer(builder.Configuration.GetConnectionString("FunDooConnection")));
 builder.Services.AddTransient<IUserBLL,UserBLL>();
 builder.Services.AddTransient<IUserDAL, UsarDAL>();
 builder.Services.AddTransient<INoteBLL,NoteBLL>();
 builder.Services.AddTransient<INotesDAL,NotesDAL>();
+builder.Services.AddTransient<ICollaboratorBLL, CollaboratorBLL>();
+builder.Services.AddTransient<ICollaboratorDAL, CollaboratorDAL>();
+builder.Services.AddTransient<ILabelBLL, LabelBLL>();
+builder.Services.AddTransient<ILabelDAL, LabelDAL>();
+builder.Services.AddScoped<ICacheDL, CacheDL>();
 builder.Services.AddTransient<TokenGenarator>();
-
+builder.Services.AddTransient<GlobalExceptionHandler>();
 // Add services to the container;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -84,16 +93,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //Console.WriteLine(builder.Configuration["FunDooConnectionS"]);
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//Console.WriteLine(builder.Configuration.GetConnectionString("FunDooConnectionS"));
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
+app.UseMiddleware<GlobalExceptionHandler>();
 app.MapControllers();
 
+//app.Run(async context => await context.Response.WriteAsync("hello world"));
 app.Run();

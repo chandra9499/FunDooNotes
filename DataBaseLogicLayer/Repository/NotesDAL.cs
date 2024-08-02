@@ -1,5 +1,7 @@
 ﻿using DataBaseLogicLayer.Context;
 using DataBaseLogicLayer.Interface;
+using Microsoft.EntityFrameworkCore;
+using Model.Models.DTOs.Labels;
 using Model.Models.DTOs.Note;
 using Model.Models.Entity;
 using Model.Models.Utility;
@@ -19,7 +21,8 @@ namespace DataBaseLogicLayer.Repository
         {
             _context = context;
         }
-        public ResponseModel<NoteDTO> CreateNote(int userId, CreateNoteDTO createNote)
+
+        public async Task<ResponseModel<NoteDTO>> CreateNoteAsync(int userId, CreateNoteDTO createNote)
         {
             var note = new Note()
             {
@@ -28,189 +31,280 @@ namespace DataBaseLogicLayer.Repository
                 CreatedAt = DateTime.Now,
                 UserId = userId
             };
-            _context.Notes.Add(note);
+
+            await _context.Notes.AddAsync(note);
+
             try
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return new ResponseModel<NoteDTO>
                 {
                     StatusCode = (int)HttpStatusCode.Created,
-                    Message = "Notes Created",
+                    Message = "Note Created",
                     Data = new NoteDTO()
                     {
                         Title = note.Title,
                         Description = note.Description,
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = note.CreatedAt,
                         UserId = note.UserId
                     }
                 };
             }
             catch (Exception ex)
             {
-                throw new Exception("unable to create notes", ex);
+                throw new Exception("Unable to create note", ex);
             }
-
         }
 
-        public ResponseModel<NoteDTO> DeleteNote(string title)
+        public async Task<ResponseModel<NoteDTO>> DeleteNoteAsync(string title)
         {
-            var notes = _context.Notes.Where(notes => notes.Title.Equals(title)).FirstOrDefault();
-            _context.Notes.Remove(notes);
+            var note = await _context.Notes.FirstOrDefaultAsync(n => n.Title == title);
+            if (note == null)
+            {
+                return new ResponseModel<NoteDTO>
+                {
+                    StatusCode = (int)HttpStatusCode.NotFound,
+                    Success = false,
+                    Message = $"Note with title {title} not found",
+                    Data = null
+                };
+            }
+
+            _context.Notes.Remove(note);
+
             try
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return new ResponseModel<NoteDTO>
                 {
                     StatusCode = (int)HttpStatusCode.OK,
                     Success = true,
-                    Message = $"note with {title} is deleted",
+                    Message = $"Note with title {title} deleted",
                     Data = new NoteDTO()
                     {
-                        //NoteId=notes.NoteId,
-                        Title = notes.Title,
-                        CreatedAt = notes.CreatedAt,
-                        Description = notes.Description,
-                        UserId = notes.UserId
+                        Title = note.Title,
+                        CreatedAt = note.CreatedAt,
+                        Description = note.Description,
+                        UserId = note.UserId
                     }
                 };
             }
             catch (Exception ex)
             {
-                throw new Exception($"note with {title} is not deleted", ex);
+                throw new Exception($"Unable to delete note with title {title}", ex);
             }
         }
 
-        public IEnumerable<Note> GetNotes(int userId)
+        public async Task<IEnumerable<Note>> GetNotesAsync(int userId)
         {
-            return _context.Notes.ToList();
+            return await _context.Notes.Include(labels=>labels.Labels).Include(collb=>collb.Collaborators).Where(note => note.UserId == userId).ToListAsync();
         }
 
-        public ResponseModel<NoteDTO> UpdateNote(CreateNoteDTO createNote)
+        public async Task<ResponseModel<NoteDTO>> UpdateNoteAsync(CreateNoteDTO createNote)
         {
-            var notes = _context.Notes.FirstOrDefault(note => note.Title.Equals(createNote.Title));
-            if (notes != null)
+            var note = await _context.Notes.FirstOrDefaultAsync(n => n.Title == createNote.Title);
+            if (note == null)
             {
-                notes.Description = createNote.Descreption;
-                notes.UpdatedAt = DateTime.Now;
-                try
+                return new ResponseModel<NoteDTO>
                 {
-                    _context.SaveChanges();
-                    return new ResponseModel<NoteDTO>
+                    StatusCode = (int)HttpStatusCode.NotFound,
+                    Success = false,
+                    Message = $"Note with title {createNote.Title} not found",
+                    Data = null
+                };
+            }
+
+            note.Description = createNote.Descreption;
+            note.UpdatedAt = DateTime.Now;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return new ResponseModel<NoteDTO>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true,
+                    Message = "Note updated successfully",
+                    Data = new NoteDTO()
                     {
-                        StatusCode = (int)HttpStatusCode.OK,
-                        Success = true,
-                        Message = "updation successfull",
-                        Data = new NoteDTO()
-                        {
-                            //NoteId = notes.NoteId,
-                            Title = notes.Title,
-                            CreatedAt = notes.CreatedAt,
-                            Description = notes.Description,
-                            UpdatedAt = notes.UpdatedAt,
-                            UserId = notes.UserId
-                        }
-                    };
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("updation unsuccessfull", ex);
-                }
+                        Title = note.Title,
+                        CreatedAt = note.CreatedAt,
+                        Description = note.Description,
+                        UpdatedAt = note.UpdatedAt,
+                        UserId = note.UserId
+                    }
+                };
             }
-            return new ResponseModel<NoteDTO>
+            catch (Exception ex)
             {
-                StatusCode = (int)HttpStatusCode.NotModified,
+                throw new Exception("Unable to update note", ex);
+            }
+        }
+
+        public async Task<ResponseModel<List<Note>>> GetNoteByIdAsync(int userId, int noteId)
+        {
+            var note = await _context.Notes
+                                     .Include(n => n.Collaborators)
+                                     .Include(n => n.Labels)
+                                     .FirstOrDefaultAsync(n => n.NoteId == noteId && n.UserId == userId);
+
+            if (note != null)
+            {
+                return new ResponseModel<List<Note>>()
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true,
+                    Message = $"Note with ID {noteId} found",
+                    Data = new List<Note> { note }
+                };
+            }
+
+            return new ResponseModel<List<Note>>()
+            {
+                StatusCode = (int)HttpStatusCode.NotFound,
                 Success = false,
-                Message = $"notes with the {createNote.Title} is not present",
+                Message = $"Note with ID {noteId} not found",
                 Data = null
             };
-
         }
 
-        public ResponseModel<NoteDTO> GetNoteByTitle(int userId, string title)
+        public async Task<ResponseModel<NoteDTO>> AddColourToNoteAsync(int userId, UpdateColourModel updateColour)
         {
-            var userNotes = GetNotes(userId).ToList();
-            if (userNotes != null)
+            var note = await _context.Notes.FirstOrDefaultAsync(n => n.UserId == userId && n.Title == updateColour.Title);
+            if (note == null)
             {
-                var note = userNotes.FirstOrDefault(note => note.Title.Equals(title));
-                if (note != null)
-                {
-                    return new ResponseModel<NoteDTO>()
-                    {
-                        StatusCode = (int)HttpStatusCode.Found,
-                        Success = true,
-                        Message = $"the note with the title {title} is",
-                        Data = new NoteDTO()
-                        {
-                            //NoteId = note.NoteId,
-                            Title = note.Title,
-                            CreatedAt = note.CreatedAt,
-                            Description = note.Description,
-                            UpdatedAt = note.UpdatedAt,
-                            UserId = note.UserId
-                        }
-                    };
-
-                }
                 return new ResponseModel<NoteDTO>()
                 {
                     StatusCode = (int)HttpStatusCode.NotFound,
                     Success = false,
-                    Message = $"the note with the title {title} is not present",
+                    Message = $"Note with title {updateColour.Title} not found",
                     Data = null
                 };
             }
-            return new ResponseModel<NoteDTO>
+
+            note.Colour = updateColour.Colour;
+
+            try
             {
-                StatusCode = (int)HttpStatusCode.OK,
-                Success = false,
-                Message = "the user does not have any note",
-                Data = null
-            };
+                await _context.SaveChangesAsync();
+                return new ResponseModel<NoteDTO>()
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true,
+                    Message = $"Colour added to note with title: {updateColour.Title}",
+                    Data = new NoteDTO()
+                    {
+                        Title = note.Title,
+                        Colour = note.Colour,
+                        CreatedAt = note.CreatedAt,
+                        UpdatedAt = note.UpdatedAt,
+                        Description = note.Description,
+                        UserId = note.UserId
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to add colour to note", ex);
+            }
         }
 
-        public ResponseModel<NoteDTO> AddColourToNote(int userId, UpdateColourModel updateColour)
+        public async Task<ResponseModel<Labels>> AddLabelsToNotesAsync(int noteId, LabelRequestModel addLabels)
         {
-            var userNotes = GetNotes(userId).ToList();
-            if (userNotes != null)
+            var note = await _context.Notes.Include(n => n.Labels).FirstOrDefaultAsync(n => n.NoteId == noteId);
+            if (note == null)
             {
-                var note = userNotes.FirstOrDefault(note => note.Title.Equals(updateColour.Title));
-                if (note != null)
-                {
-                    note.Colour = updateColour.Colour;
-                    _context.SaveChanges();
-                    return new ResponseModel<NoteDTO>()
-                    {
-                        StatusCode = (int)HttpStatusCode.OK,
-                        Success = true,
-                        Message = $"colour added to the note with title:-{updateColour.Title}",
-                        Data = new NoteDTO()
-                        {
-                            Title = note.Title,
-                            colour = note.Colour,
-                            CreatedAt = note.CreatedAt,
-                            UpdatedAt = DateTime.Now,
-                            Description = note.Description,
-                            UserId = note.UserId
-                        }
-                    };
-                }
-                return new ResponseModel<NoteDTO>()
+                return new ResponseModel<Labels>
                 {
                     StatusCode = (int)HttpStatusCode.NotFound,
                     Success = false,
-                    Message = $"the note with title:-{updateColour.Title} is not present",
+                    Message = "Note not found",
                     Data = null
                 };
             }
-            return new ResponseModel<NoteDTO>()
+
+            var existingLabel = await _context.Labels.FirstOrDefaultAsync(label => label.LabelsName == addLabels.LabelsName);
+            Labels label;
+
+            if (existingLabel != null)
             {
-                StatusCode = (int)HttpStatusCode.OK,
-                Success = false,
-                Message = $"the user doesn't have any notes",
-                Data = null
-            };
+                label = existingLabel;
+                if (!note.Labels.Contains(label))
+                {
+                    note.Labels.Add(label);
+                }
+            }
+            else
+            {
+                label = new Labels
+                {
+                    LabelsName = addLabels.LabelsName,
+                    LabelsDescription = addLabels.LabelsDescription
+                };
+                note.Labels.Add(label);
+                _context.Labels.Add(label);
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return new ResponseModel<Labels>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true,
+                    Message = "Label added to note",
+                    Data = label
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to add label to note", ex);
+            }
         }
 
-        
+        public async Task<ResponseModel<Labels>> RemoveLabelsToNotesAsync(int noteId, String labelName)
+        {
+            var note = await _context.Notes.Include(label=>label.Labels).FirstOrDefaultAsync(note=>note.NoteId.Equals(noteId));
+            if (note == null) 
+            {
+                return new ResponseModel<Labels>
+                {
+                    StatusCode = (int)HttpStatusCode.NotFound,
+                    Success = false,
+                    Message = "Note not found",
+                    Data = null
+                };
+            }
+            var label = note.Labels.Where(label=>label.LabelsName.Equals(labelName)).FirstOrDefault();
+            if (label == null)
+            {
+                return new ResponseModel<Labels>
+                {
+                    StatusCode = (int)HttpStatusCode.NotFound,
+                    Success = false,
+                    Message = "Note does not have any label",
+                    Data = null
+                };
+            }
+            _context.Labels.Remove(label);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return new ResponseModel<Labels>
+                {
+                    StatusCode = (int)HttpStatusCode.OK,
+                    Success = true,
+                    Message = "Label removed from the note",
+                    Data = label
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unable to remove the label from note", ex);
+            }
+
+
+        }
+
     }
 }
