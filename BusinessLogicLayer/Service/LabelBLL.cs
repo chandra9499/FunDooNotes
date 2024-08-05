@@ -18,9 +18,9 @@ namespace BusinessLayer.Service
             _labelDAL = labelDAL;
         }
 
-        public IEnumerable<Labels> GetAllLabel()
+        public IEnumerable<Labels> GetAllLabelsForTheNote(int noteId)
         {
-            return _labelDAL.GetAllLabel();
+            return _labelDAL.GetAllLabelsForTheNote(noteId);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace DataBaseLayer.Helper
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = new ResponseModel<object>
+            var response = new ResponseModel<object>()
             {
                 StatusCode = context.Response.StatusCode,
                 Success = false,

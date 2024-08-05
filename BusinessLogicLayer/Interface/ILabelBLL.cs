@@ -10,6 +10,6 @@ namespace BusinessLayer.Interface
 {
     public interface ILabelBLL
     {
-        public IEnumerable<Labels> GetAllLabel();
+        public IEnumerable<Labels> GetAllLabelsForTheNote(int noteId);
     }
 }

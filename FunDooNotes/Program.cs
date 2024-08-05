@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using System.Security.Claims;
 using System.Text;
 
@@ -21,7 +22,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 //let's initialize the database context
-builder.Services.AddDbContext<FunDooDataBaseContext>(cfg=>cfg.UseSqlServer(builder.Configuration.GetConnectionString("FunDooConnection")));
+builder.Services.AddDbContext<FunDooDataBaseContext>(
+    cfg=>cfg.UseSqlServer(builder.Configuration.GetConnectionString("FunDooConnection")));
 builder.Services.AddTransient<IUserBLL,UserBLL>();
 builder.Services.AddTransient<IUserDAL, UsarDAL>();
 builder.Services.AddTransient<INoteBLL,NoteBLL>();
@@ -30,9 +32,15 @@ builder.Services.AddTransient<ICollaboratorBLL, CollaboratorBLL>();
 builder.Services.AddTransient<ICollaboratorDAL, CollaboratorDAL>();
 builder.Services.AddTransient<ILabelBLL, LabelBLL>();
 builder.Services.AddTransient<ILabelDAL, LabelDAL>();
-builder.Services.AddScoped<ICacheDL, CacheDL>();
 builder.Services.AddTransient<TokenGenarator>();
 builder.Services.AddTransient<GlobalExceptionHandler>();
+
+// configure Redis into the application
+var redisConnectionString = builder.Configuration["Redis:ConnectionString"];
+var connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+builder.Services.AddSingleton<IConnectionMultiplexer>(connectionMultiplexer);
+builder.Services.AddScoped<ICacheDL, CacheDL>();
+
 // Add services to the container;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

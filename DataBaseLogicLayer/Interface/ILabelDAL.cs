@@ -11,6 +11,6 @@ namespace DataBaseLogicLayer.Interface
 {
     public interface ILabelDAL
     {
-        public IEnumerable<Labels> GetAllLabel();
+        public IEnumerable<Labels> GetAllLabelsForTheNote(int noteId);
     }
 }

@@ -1,4 +1,5 @@
-﻿using DataBaseLogicLayer.Context;
+﻿using DataBaseLayer.Interface;
+using DataBaseLogicLayer.Context;
 using DataBaseLogicLayer.Interface;
 using Microsoft.EntityFrameworkCore;
 using Model.Models.DTOs.Labels;
@@ -7,7 +8,6 @@ using Model.Models.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataBaseLayer.Repository
@@ -15,13 +15,24 @@ namespace DataBaseLayer.Repository
     public class LabelDAL : ILabelDAL
     {
         private readonly FunDooDataBaseContext _context;
-        public LabelDAL(FunDooDataBaseContext context) 
+        private readonly ICacheDL _cacheDL;
+
+        public LabelDAL(FunDooDataBaseContext context, ICacheDL cacheDL)
         {
             _context = context;
+            _cacheDL = cacheDL;
         }
-        public IEnumerable<Labels> GetAllLabel()
+
+        public IEnumerable<Labels> GetAllLabelsForTheNote(int noteId)
         {
-            return _context.Labels.Include(note => note.Notes).ToList();
+            var cacheKey = $"note:{noteId}_allLabels";
+            var labels = _context.Labels.Include(note => note.Notes).ToList();
+            if (labels.Any())
+            {
+                _cacheDL.SetData(cacheKey, labels, DateTimeOffset.Now.AddMinutes(20));
+            }
+
+            return labels;
         }
     }
 }

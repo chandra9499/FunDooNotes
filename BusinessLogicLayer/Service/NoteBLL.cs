@@ -22,37 +22,37 @@ namespace BusinessLogicLayer.Service
 
         public async Task<ResponseModel<NoteDTO>> AddColourToNoteAsync(int userId, UpdateColourModel updateColour)
         {
-            return await _notesDAL.AddColourToNoteAsync(userId,updateColour);
+            return await _notesDAL.AssignColourToNoteAsync(userId,updateColour);
         }
 
         public async Task<ResponseModel<Labels>> AddLabelsToNotesAsync(int noteId, LabelRequestModel addLabels)
         {
-            return await _notesDAL.AddLabelsToNotesAsync(noteId, addLabels);
+            return await _notesDAL.AssignLabelsToNoteAsync(noteId, addLabels);
         }
 
         public async Task<ResponseModel<NoteDTO>> CreateNoteAsync(int userId, CreateNoteDTO createNote)
         {
-            return await _notesDAL.CreateNoteAsync(userId,createNote);
+            return await _notesDAL.AddNoteAsync(userId,createNote);
         }
 
-        public async Task<ResponseModel<NoteDTO>> DeleteNoteAsync(string title)
+        public async Task<ResponseModel<NoteDTO>> DeleteByNoteIdAsync(int noteId)
         {
-            return await _notesDAL.DeleteNoteAsync(title);
+            return await _notesDAL.RemoveNoteAsync(noteId);
         }
 
         public async Task<ResponseModel<List<Note>>> GetNoteByIdAsync(int userId, int noteId)
         {
-            return await _notesDAL.GetNoteByIdAsync(userId, noteId);
+            return await _notesDAL.RetrieveNoteByIdAsync(userId, noteId);
         }
 
         public async Task<IEnumerable<Note>> GetNotesAsync(int userId)
         {
-            return await _notesDAL.GetNotesAsync(userId);
+            return await _notesDAL.RetrieveNotesAsync(userId);
         }
 
         public async Task<ResponseModel<NoteDTO>> UpdateNoteAsync(CreateNoteDTO createNote)
         {
-            return await _notesDAL.UpdateNoteAsync(createNote);
+            return await _notesDAL.ModifyNoteAsync(createNote);
         }
     }
 }

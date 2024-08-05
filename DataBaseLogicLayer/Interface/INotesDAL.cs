@@ -12,12 +12,13 @@ namespace DataBaseLogicLayer.Interface
 {
     public interface INotesDAL
     {
-        Task<ResponseModel<NoteDTO>> CreateNoteAsync(int userId, CreateNoteDTO createNote);
-        Task<IEnumerable<Note>> GetNotesAsync(int userId);
-        Task<ResponseModel<NoteDTO>> UpdateNoteAsync(CreateNoteDTO createNote);
-        Task<ResponseModel<List<Note>>> GetNoteByIdAsync(int userId, int noteId);
-        Task<ResponseModel<NoteDTO>> DeleteNoteAsync(string title);
-        Task<ResponseModel<NoteDTO>> AddColourToNoteAsync(int userId, UpdateColourModel updateColour);
-        Task<ResponseModel<Labels>> AddLabelsToNotesAsync(int noteId, LabelRequestModel label);
+        Task<ResponseModel<NoteDTO>> AddNoteAsync(int userId, CreateNoteDTO createNote);
+        Task<ResponseModel<NoteDTO>> RemoveNoteAsync(int noteId);
+        Task<IEnumerable<Note>> RetrieveNotesAsync(int userId);
+        Task<ResponseModel<NoteDTO>> ModifyNoteAsync(CreateNoteDTO createNote);
+        Task<ResponseModel<List<Note>>> RetrieveNoteByIdAsync(int userId, int noteId);
+        Task<ResponseModel<NoteDTO>> AssignColourToNoteAsync(int userId, UpdateColourModel updateColour);
+        Task<ResponseModel<Labels>> AssignLabelsToNoteAsync(int noteId, LabelRequestModel addLabels);
+        Task<ResponseModel<Labels>> UnassignLabelsFromNoteAsync(int noteId, string labelName);
     }
 }

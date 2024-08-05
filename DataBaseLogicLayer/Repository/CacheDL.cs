@@ -11,16 +11,21 @@ namespace DataBaseLayer.Repository
 {
     public class CacheDL : ICacheDL
     {
-        private IDatabase _cacheDb;
-        public CacheDL()
+        private readonly IDatabase _cacheDb;
+
+        public CacheDL(IConnectionMultiplexer connectionMultiplexer)
         {
-            var radis = ConnectionMultiplexer.Connect("localhost:6379");
-            _cacheDb = radis.GetDatabase();
+            _cacheDb = connectionMultiplexer.GetDatabase();
         }
+        //public CacheDL()
+        //{
+        //    var radis = ConnectionMultiplexer.Connect("localhost:6379");
+        //    _cacheDb = radis.GetDatabase();
+        //}
         public T GetData<T>(string key)
         {
             var value = _cacheDb.StringGet(key);
-            if (value.IsNullOrEmpty!)
+            if (!value.IsNullOrEmpty)
             {
                 return JsonSerializer.Deserialize<T>(value);
             }
@@ -29,20 +34,21 @@ namespace DataBaseLayer.Repository
 
         public object RemoveData(string key)
         {
-            var exist = _cacheDb.KeyExists(key);
-
-            if (exist) 
-            {
-                return _cacheDb.KeyDelete(key);
-            }
-            return false;
+            return _cacheDb.KeyDelete(key);
         }
 
         public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
         {
-            var expieryTime = expirationTime - DateTimeOffset.UtcNow ;
-            var isSet = _cacheDb.StringSet(key, JsonSerializer.Serialize(value),expieryTime);
-            return isSet;
+            var expiryTime = expirationTime - DateTimeOffset.UtcNow;
+
+            // Ensure that expiryTime is non-negative
+            if (expiryTime <= TimeSpan.Zero)
+            {
+                expiryTime = TimeSpan.FromMinutes(1); // Set to minimum expiry time of 1 second
+            }
+
+            var serializedValue = JsonSerializer.Serialize(value);
+            return _cacheDb.StringSet(key, serializedValue, expiryTime);
         }
     }
 }
